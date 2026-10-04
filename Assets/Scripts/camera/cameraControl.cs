@@ -6,6 +6,7 @@ using UnityEngine.SocialPlatforms;
 
 public class cameraControl : MonoBehaviour
 {
+    public Camera camera;
 
     [Header("Sensivity settings")]
     [Range(0.01f, 100f)] public float camSensivity = 15f;
@@ -154,7 +155,12 @@ public class cameraControl : MonoBehaviour
         Vector3 finalDirection = vertDirection + horizDirection;
 
         float currentFlySpeed = flySpeed;
-        if (Keyboard.current.shiftKey.isPressed) currentFlySpeed *= sprintMultiplier;
+        if (Keyboard.current.shiftKey.isPressed)
+        {
+            currentFlySpeed *= sprintMultiplier;
+            camera.fieldOfView = Mathf.Lerp(camera.fieldOfView, 70f, 25f * Time.deltaTime);
+        }
+        else camera.fieldOfView = Mathf.Lerp(camera.fieldOfView, 60f, 25f * Time.deltaTime);
 
         Vector3 targetVelocity = finalDirection * currentFlySpeed;
         currentVelocity = Vector3.Lerp(currentVelocity, targetVelocity, acceleration * Time.deltaTime);

@@ -2336,6 +2336,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb3d082fe082a0e4c9cd374848fe8b14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::cameraControl
+  camera: {fileID: 1179235844}
   camSensivity: 1
   camBarrelSensivity: 2
   xRotationLimit: 85
@@ -2656,6 +2657,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb3d082fe082a0e4c9cd374848fe8b14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::cameraControl
+  camera: {fileID: 0}
   camSensivity: 15
   camBarrelSensivity: 2
   xRotationLimit: 85
