@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -10,16 +8,16 @@ public class cameraControl : MonoBehaviour
 {
 
     [Header("Sensivity settings")]
-    [Range(1, 100)] public float camSensivity = 15f;
-    [Range(0, 100)] public float camBarrelSensivity = 2f;
-    [Range(0, 90)] public float xRotationLimit = 85f;
+    [Range(0.01f, 100f)] public float camSensivity = 15f;
+    [Range(0f, 200f)] public float camBarrelSensivity = 2f;
+    public float xRotationLimit = 85f;
 
 
 
     [Header("Movement settings")]
     public float flySpeed = 10f;
-    [Min(0)]public int sprintMultiplier = 2;
-    [Min(0)]public float acceleration = 10f;
+    [Min(0f)]public float sprintMultiplier = 2f;
+    [Min(0f)]public float acceleration = 10f;
 
 
 
@@ -51,7 +49,17 @@ public class cameraControl : MonoBehaviour
         xRotation = currentAngles.x;
         yRotation = currentAngles.y;
         zRotation = 0f;
-        
+    }
+
+    void Update()
+    {
+        rotateCamera();
+        movementCamera();
+    }
+
+    private void HandleSensivityUpdate(PlayerPrefSettings setting, float value)
+    {
+        if (setting.ToString() == "Sensivity") camSensivity = value;
     }
 
     void OnEnable()
@@ -64,20 +72,11 @@ public class cameraControl : MonoBehaviour
         SettingsEvents.OnSettingChanged -= HandleSensivityUpdate;
     }
 
-    void Update()
-    {
-        rotateCamera();
-        movementCamera();
-    }
-
+    
 
 
 
     //Functions
-    private void HandleSensivityUpdate(PlayerPrefSettings setting, float value)
-    {
-        if (setting.ToString() == "Sensivity") camSensivity = value;
-    }
     private void rotateCamera()
     {
         if (Keyboard.current == null || Mouse.current == null) return;
@@ -119,7 +118,7 @@ public class cameraControl : MonoBehaviour
         else if (showCursor)
         {
             Cursor.lockState = CursorLockMode.None;
-            zRotation = 0;
+            zRotation = 0f;
             transform.rotation = Quaternion.Euler(xRotation, yRotation, zRotation);
         }
     }
@@ -145,23 +144,20 @@ public class cameraControl : MonoBehaviour
 
         Vector3 camForward = transform.forward;
         Vector3 camStrafe = transform.right;
-        Vector3 camVert = transform.up;
+        Vector3 worldVert = Vector3.up;
 
-        Vector3 direction = (camForward * forwardInput) + (camStrafe * strafeInput) + (camVert * verticalInput);
+        Vector3 horizDirection = (camForward * forwardInput) + (camStrafe * strafeInput);
+        if (horizDirection.sqrMagnitude > 1f) horizDirection.Normalize();
 
-        if (direction.sqrMagnitude > 1f) direction.Normalize();
+        Vector3 vertDirection = worldVert * verticalInput;
+
+        Vector3 finalDirection = vertDirection + horizDirection;
 
         float currentFlySpeed = flySpeed;
         if (Keyboard.current.shiftKey.isPressed) currentFlySpeed *= sprintMultiplier;
 
-        Vector3 targetVelocity = direction * currentFlySpeed;
+        Vector3 targetVelocity = finalDirection * currentFlySpeed;
         currentVelocity = Vector3.Lerp(currentVelocity, targetVelocity, acceleration * Time.deltaTime);
         transform.position += currentVelocity * Time.deltaTime;
     }
-
-
-
-
-
-    
 }
